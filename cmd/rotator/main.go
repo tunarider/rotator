@@ -10,6 +10,7 @@ import (
 func main() {
 	app := &cli.App{
 		Name: "Rotator",
+		Version: "v0.1.0",
 		Flags: []cli.Flag{
 			&cli.PathFlag{
 				Name: "config",
