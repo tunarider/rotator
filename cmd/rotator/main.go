@@ -11,7 +11,7 @@ func main() {
 	app := &cli.App{
 		Name:    "Rotator",
 		Usage:   "rotate files",
-		Version: "v0.1.2",
+		Version: "v0.2.0",
 		Flags: []cli.Flag{
 			&cli.PathFlag{
 				Name:    "config",
