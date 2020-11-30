@@ -6,10 +6,18 @@ import (
 	"io/ioutil"
 )
 
-type Action int
+type Action string
 
 const (
-	ActionArchive Action = 0
+	ActionArchive Action = "archive"
+)
+
+type GroupBy string
+
+const (
+	GroupByDate = "date"
+	GroupByName = "name"
+	GroupByFile = "file"
 )
 
 type Target struct {
@@ -18,9 +26,9 @@ type Target struct {
 	Regexp     string
 	DateFormat string `yaml:"date_format"`
 	Retention  int
-	Group      bool
-	GroupDate  bool `yaml:"group_date"`
+	GroupBy    GroupBy `yaml:"group_by"`
 	Action     Action
+	Remove     bool
 }
 
 type Config struct {
