@@ -16,10 +16,6 @@ func main() {
 				Name: "config",
 				Aliases: []string{"c"},
 			},
-			&cli.BoolFlag{
-				Name: "dry",
-				Aliases: []string{"d"},
-			},
 		},
 		Action: func(c *cli.Context) error {
 			conf, err := config.ParseConfig(c.Path("config"))
