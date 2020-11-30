@@ -17,13 +17,17 @@ func main() {
 				Name:    "config",
 				Aliases: []string{"c"},
 			},
+			&cli.BoolFlag{
+				Name:    "dry",
+				Aliases: []string{"d"},
+			},
 		},
 		Action: func(c *cli.Context) error {
 			conf, err := config.ParseConfig(c.Path("config"))
 			if err != nil {
 				return cli.Exit(err, 1)
 			}
-			return cmd.Rotate(conf)
+			return cmd.Rotate(conf, c.Bool("dry"))
 		},
 	}
 	err := app.Run(os.Args)

@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"errors"
+	"fmt"
 	"github.com/mholt/archiver/v3"
 	"github.com/mitchellh/go-homedir"
 	"github.com/tunarider/rotator/internal/config"
@@ -10,7 +11,7 @@ import (
 	"path/filepath"
 )
 
-func Rotate(conf *config.Config) error {
+func Rotate(conf *config.Config, dry bool) error {
 	for _, target := range conf.Targets {
 		var err error
 		target.Path, err = homedir.Expand(target.Path)
@@ -18,7 +19,7 @@ func Rotate(conf *config.Config) error {
 			return cli.Exit(err, 1)
 		}
 		if target.Action == config.ActionArchive {
-			err := archive(target)
+			err := archive(target, dry)
 			if err != nil {
 				return cli.Exit(err, 2)
 			}
@@ -27,7 +28,7 @@ func Rotate(conf *config.Config) error {
 	return nil
 }
 
-func archive(target config.Target) error {
+func archive(target config.Target, dry bool) error {
 	var targetPaths []string
 	filterDate, err := util.MakeDateFilter(target.Regexp, target.DateFormat)
 	if err != nil {
@@ -52,23 +53,42 @@ func archive(target config.Target) error {
 				return errors.New("failed to group target files")
 			}
 			for _, group := range groups {
-				err = archiver.Archive(
-					util.GetFilePathsFromGroup(target.Path, group),
-					filepath.Join(target.Path, group.Name)+".tar.gz",
-				)
+				targetPaths := util.GetFilePathsFromGroup(target.Path, group)
+				if dry {
+					fmt.Printf("archive:\n  group: %s\n", filepath.Join(target.Path, group.Name)+".tar.gz")
+					for _, p := range targetPaths {
+						fmt.Printf("    file: %s\n", p)
+					}
+				} else {
+					err = archiver.Archive(targetPaths, filepath.Join(target.Path, group.Name)+".tar.gz")
+					if err != nil {
+						return err
+					}
+				}
+			}
+		} else {
+			if dry {
+				fmt.Printf("archive:\n  group: %s\n", filepath.Join(target.Path, target.Name)+".tar.gz")
+				for _, p := range targetPaths {
+					fmt.Printf("    file: %s\n", p)
+				}
+			} else {
+				err = archiver.Archive(targetPaths, filepath.Join(target.Path, target.Name)+".tar.gz")
 				if err != nil {
 					return err
 				}
 			}
-		} else {
-			err = archiver.Archive(targetPaths, filepath.Join(target.Path, target.Name)+".tar.gz")
-			if err != nil {
-				return err
-			}
 		}
 	} else {
 		for _, path := range targetPaths {
-			err = archiver.CompressFile(path, path+".gz")
+			if dry {
+				fmt.Printf("archive: %s to %s\n", path, path+".gz")
+			} else {
+				err = archiver.CompressFile(path, path+".gz")
+				if err != nil {
+					return err
+				}
+			}
 		}
 	}
 	return nil
