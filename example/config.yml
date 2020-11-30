@@ -1,0 +1,10 @@
+---
+targets:
+  - name: test
+    path: /var/log/test
+    regexp: test_.+_([0-9]+)\.log$
+    date_format: 20060102
+    retention: 7
+    group: yes
+    group_date: yes
+    action: 0
