@@ -9,12 +9,12 @@ import (
 
 func main() {
 	app := &cli.App{
-		Name: "Rotator",
-		Usage: "rotate files",
-		Version: "v0.1.1",
+		Name:    "Rotator",
+		Usage:   "rotate files",
+		Version: "v0.1.2",
 		Flags: []cli.Flag{
 			&cli.PathFlag{
-				Name: "config",
+				Name:    "config",
 				Aliases: []string{"c"},
 			},
 		},
