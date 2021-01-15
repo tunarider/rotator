@@ -41,7 +41,7 @@ func archive(target config.Target, dry bool) error {
 	}
 	files, err := util.GetTargetFiles(checkTarget, target)
 	if err != nil {
-		return errors.New("failed to filter target files")
+		return errors.New(fmt.Sprintf("%s: %s", "failed to filter target files", err))
 	}
 	for _, file := range files {
 		targetPaths = append(targetPaths, filepath.Join(target.Path, file.Name()))
