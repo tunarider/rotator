@@ -20,18 +20,26 @@ const (
 	GroupByFile = "file"
 )
 
+type Global struct {
+	DateFormat *string `yaml:"date_format"`
+	Retention  *int
+	GroupBy    *GroupBy `yaml:"group_by"`
+	Remove     *bool
+}
+
 type Target struct {
 	Name       string
 	Path       string
 	Regexp     string
-	DateFormat string `yaml:"date_format"`
-	Retention  int
-	GroupBy    GroupBy `yaml:"group_by"`
 	Action     Action
-	Remove     bool
+	DateFormat *string `yaml:"date_format"`
+	Retention  *int
+	GroupBy    *GroupBy `yaml:"group_by"`
+	Remove     *bool
 }
 
 type Config struct {
+	Global  Global
 	Targets []Target
 }
 
@@ -45,5 +53,19 @@ func ParseConfig(configPath string) (*Config, error) {
 		return c, errors.New("failed to read config file")
 	}
 	err = yaml.Unmarshal(configFile, c)
+	for i, _ := range c.Targets {
+		if c.Targets[i].DateFormat == nil {
+			c.Targets[i].DateFormat = c.Global.DateFormat
+		}
+		if c.Targets[i].Retention == nil {
+			c.Targets[i].Retention = c.Global.Retention
+		}
+		if c.Targets[i].GroupBy == nil {
+			c.Targets[i].GroupBy = c.Global.GroupBy
+		}
+		if c.Targets[i].Remove == nil {
+			c.Targets[i].Remove = c.Global.Remove
+		}
+	}
 	return c, err
 }

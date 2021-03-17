@@ -1,10 +1,12 @@
 ---
+global:
+  date_format: 20060102
+  retention: 7
+  group_by: date
+  remove: yes
 targets:
-  - name: test
-    path: /var/log/test/
-    regexp: test_.+_([0-9]+)\.log$
-    date_format: 20060102
-    retention: 7
-    group_by: name
+  - name: messages
+    path: /tmp/rotator
+    regexp: messages-([0-9]+)$
     action: archive
-    remove: yes
+

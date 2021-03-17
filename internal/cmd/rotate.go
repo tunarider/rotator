@@ -31,11 +31,11 @@ func Rotate(conf *config.Config, dry bool) error {
 
 func archive(target config.Target, dry bool) error {
 	var targetPaths []string
-	filterDate, err := util.MakeDateFilter(target.Regexp, target.DateFormat)
+	filterDate, err := util.MakeDateFilter(target.Regexp, *target.DateFormat)
 	if err != nil {
 		return errors.New("failed to init date filter")
 	}
-	checkTarget, err := util.MakeTargetChecker(target.Retention, filterDate)
+	checkTarget, err := util.MakeTargetChecker(*target.Retention, filterDate)
 	if err != nil {
 		return errors.New("failed to init target checker")
 	}
@@ -46,7 +46,7 @@ func archive(target config.Target, dry bool) error {
 	for _, file := range files {
 		targetPaths = append(targetPaths, filepath.Join(target.Path, file.Name()))
 	}
-	if target.GroupBy == config.GroupByDate {
+	if *target.GroupBy == config.GroupByDate {
 		var groups []util.FileGroup
 		groups, err = util.GroupByDate(target.Name, filterDate, files)
 		if err != nil {
@@ -59,9 +59,9 @@ func archive(target config.Target, dry bool) error {
 				return err
 			}
 		}
-	} else if target.GroupBy == config.GroupByName {
+	} else if *target.GroupBy == config.GroupByName {
 		return archiveByGroup(target, targetPaths, filepath.Join(target.Path, target.Name)+".tar.gz", dry)
-	} else if target.GroupBy == config.GroupByFile {
+	} else if *target.GroupBy == config.GroupByFile {
 		for _, path := range targetPaths {
 			err = archiveFile(target, path, dry)
 			if err != nil {
@@ -83,7 +83,7 @@ func archiveByGroup(target config.Target, targetPaths []string, output string, d
 		if err != nil {
 			return err
 		}
-		if target.Remove {
+		if *target.Remove {
 			for _, p := range targetPaths {
 				err = os.Remove(p)
 				if err != nil {
@@ -103,7 +103,7 @@ func archiveFile(target config.Target, path string, dry bool) error {
 		if err != nil {
 			return err
 		}
-		if target.Remove {
+		if *target.Remove {
 			return os.Remove(path)
 		}
 	}
